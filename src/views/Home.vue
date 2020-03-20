@@ -4,9 +4,7 @@
       <v-flex xs12>
         <v-text-field name="funds" label="Enter Income" id="funds" v-model="income"></v-text-field>
       </v-flex>
-      <v-flex xs12 class="pa-3">
-        <v-btn color="primary" dark>Add New Income</v-btn>
-      </v-flex>
+      <AddIncomeDialog />
     </v-layout>
     <v-layout row wrap>
       <v-flex xs12>
@@ -35,13 +33,15 @@
 </template>
 
 <script>
+import AddIncomeDialog from "../components/AddIncomeDialog";
 export default {
   data() {
     return {
       income: 0,
+      incomeTitle: "",
       incomeCards: [
         {
-          title: "Income",
+          title: this.incomeTitle,
           inputLabel: "Income 1",
           cardIncome: 0
         }
@@ -70,6 +70,9 @@ export default {
         cardIncome: 0
       });
     }
+  },
+  components: {
+    AddIncomeDialog
   }
 };
 </script>
