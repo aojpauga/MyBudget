@@ -19,7 +19,7 @@
           <div class="ma-3">{{ card.title }}</div>
           <div>
             <v-row class="mx-auto">
-              <v-text-field class="ma-3" :label="card.inputLabel" v-model="card.cardIncome"></v-text-field>
+              <v-text-field class="ma-3" :label="card.inputLabel" v-model="card.amount"></v-text-field>
               <v-checkbox class="ma-3" label="Paid"></v-checkbox>
             </v-row>
           </div>
@@ -34,18 +34,13 @@
 
 <script>
 import AddIncomeDialog from "../components/AddIncomeDialog";
+import db from "@/fb.js";
 export default {
   data() {
     return {
       income: 0,
       incomeTitle: "",
-      incomeCards: [
-        {
-          title: this.incomeTitle,
-          inputLabel: "Income 1",
-          cardIncome: 0
-        }
-      ],
+      incomeCards: [],
       expenseCards: [
         {
           title: "Expenses",
@@ -69,7 +64,22 @@ export default {
         inputLabel: "Income " + this.count,
         cardIncome: 0
       });
-    }
+    },
+    created: function() {}
+  },
+  created() {
+    db.collection("income").onSnapshot(res => {
+      const changes = res.docChanges();
+
+      changes.forEach(change => {
+        if (change.type === "added") {
+          this.incomeCards.push({
+            ...change.doc.data(),
+            id: change.doc.id
+          });
+        }
+      });
+    });
   },
   components: {
     AddIncomeDialog
