@@ -4,36 +4,57 @@
       <v-flex xs12>
         <v-text-field name="funds" label="Enter Income" id="funds" v-model="income"></v-text-field>
       </v-flex>
-      <AddIncomeDialog />
     </v-layout>
     <v-layout row wrap>
-      <v-flex xs12>
-        <v-card
-          xs12
-          class="pa-3"
-          max-width="500"
-          justify-space-around
-          v-for="card in incomeCards"
-          :key="card.title"
-        >
-          <div class="ma-3">{{ card.title }}</div>
-          <div>
-            <v-row class="mx-auto">
-              <v-text-field class="ma-3" :label="card.inputLabel" v-model="card.amount"></v-text-field>
-              <v-checkbox class="ma-3" label="Paid"></v-checkbox>
-            </v-row>
-          </div>
-        </v-card>
-      </v-flex>
+      <v-col>
+        <v-flex xs12>
+          <AddIncomeDialog />
+          <v-card
+            xs12
+            class="pa-3"
+            max-width="500"
+            justify-space-around
+            v-for="card in incomeCards"
+            :key="card.title"
+          >
+            <div class="ma-3">{{ card.title }}</div>
+            <div>
+              <v-row class="mx-auto">
+                <v-text-field class="ma-3" :label="card.inputLabel" v-model="card.amount"></v-text-field>
+                <v-checkbox class="ma-3" label="Paid"></v-checkbox>
+              </v-row>
+            </div>
+          </v-card>
+        </v-flex>
+      </v-col>
+      <v-col>
+        <v-flex xs12>
+          <AddExpenseDialog />
+          <v-card
+            xs12
+            class="pa-3"
+            max-width="500"
+            justify-space-around
+            v-for="card in expenseCards"
+            :key="card.title"
+          >
+            <div class="ma-3">{{ card.title }}</div>
+            <div>
+              <v-row class="mx-auto">
+                <v-text-field class="ma-3" :label="card.inputLabel" v-model="card.amount"></v-text-field>
+                <v-checkbox class="ma-3" label="Paid"></v-checkbox>
+              </v-row>
+            </div>
+          </v-card>
+        </v-flex>
+      </v-col>
     </v-layout>
-    <v-btn class="mx-2" fab dark color="primary" v-on:click.native="addIncomeCard">
-      <v-icon dark>mdi-plus</v-icon>
-    </v-btn>
   </v-container>
 </template>
 
 <script>
 import AddIncomeDialog from "../components/AddIncomeDialog";
+import AddExpenseDialog from "../components/AddExpenseDialog";
 import db from "@/fb.js";
 export default {
   data() {
@@ -41,13 +62,7 @@ export default {
       income: 0,
       incomeTitle: "",
       incomeCards: [],
-      expenseCards: [
-        {
-          title: "Expenses",
-          inputLabel: "Expense 1",
-          cardExpense: 0
-        }
-      ],
+      expenseCards: [],
       count: 1
     };
   },
@@ -64,8 +79,7 @@ export default {
         inputLabel: "Income " + this.count,
         cardIncome: 0
       });
-    },
-    created: function() {}
+    }
   },
   created() {
     db.collection("income").onSnapshot(res => {
@@ -80,9 +94,23 @@ export default {
         }
       });
     });
+
+    db.collection("expense").onSnapshot(res => {
+      const changes = res.docChanges();
+
+      changes.forEach(change => {
+        if (change.type === "added") {
+          this.expenseCards.push({
+            ...change.doc.data(),
+            id: change.doc.id
+          });
+        }
+      });
+    });
   },
   components: {
-    AddIncomeDialog
+    AddIncomeDialog,
+    AddExpenseDialog
   }
 };
 </script>
