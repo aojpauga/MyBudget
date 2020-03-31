@@ -18,12 +18,12 @@
             :key="card.title"
           >
             <div class="ma-3">{{ card.title }}</div>
-            <div>{{card.id}}</div>
+
             <div>
               <v-row class="mx-auto">
                 <v-text-field class="ma-3" :label="card.inputLabel" v-model="card.amount"></v-text-field>
 
-                <v-checkbox class="ma-3" label="Paid"></v-checkbox>
+                <v-checkbox class="ma-3" label="Paid" v-on:click.native="addToTotalIncome"></v-checkbox>
                 <div class="text-center">
                   <v-dialog v-model="dialog" width="500" :retain-focus="false">
                     <template v-slot:activator="{ on }">
@@ -103,9 +103,12 @@ export default {
     };
   },
   methods: {
-    addIncome: function() {
-      for (var card in this.cards) {
-        this.income += card.cardIncome;
+    addToTotalIncome: function() {
+      console.log(this.incomeCards[0].amount);
+      console.log(this.income);
+      for (var card in this.incomeCards) {
+        this.income += this.incomeCards[card].amount;
+        console.log(this.income);
       }
     },
     addIncomeCard: function() {
