@@ -23,9 +23,14 @@
               <v-row class="mx-auto">
                 <v-text-field class="ma-3" :label="card.inputLabel" v-model="card.amount"></v-text-field>
 
-                <v-checkbox class="ma-3" label="Paid" v-on:click.native="addToTotalIncome"></v-checkbox>
+                <v-checkbox
+                  class="ma-3"
+                  label="Paid"
+                  v-model="card.checkBox"
+                  v-on:click.native="addToTotalIncome"
+                ></v-checkbox>
                 <div class="text-center">
-                  <v-dialog v-model="dialog" width="500" :retain-focus="false">
+                  <v-dialog v-model="incomeDialog" width="500" :retain-focus="false">
                     <template v-slot:activator="{ on }">
                       <v-btn color="red lighten-2" dark v-on="on" @click="incomeID=card.id">Delete</v-btn>
                     </template>
@@ -73,9 +78,31 @@
               <v-row class="mx-auto">
                 <v-text-field class="ma-3" :label="card.inputLabel" v-model="card.amount"></v-text-field>
                 <v-checkbox class="ma-3" label="Paid"></v-checkbox>
-                <v-btn class="mx-2" fab dark small color="error">
-                  <v-icon dark>mdi-minus</v-icon>
-                </v-btn>
+                <div class="text-center">
+                  <v-dialog v-model="expenseDialog" width="500" :retain-focus="false">
+                    <template v-slot:activator="{ on }">
+                      <v-btn color="red lighten-2" dark v-on="on" @click="expenseID=card.id">Delete</v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-title class="headline grey lighten-2" primary-title>Delete</v-card-title>
+
+                      <v-card-text>Are you sure you want to delete this item?</v-card-text>
+                      <v-text-field v-model="expenseID"></v-text-field>
+
+                      <v-divider></v-divider>
+
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          color="primary"
+                          text
+                          @click="dialog = false"
+                          v-on:click.native="deleteExpense(expenseID)"
+                        >Delete</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </div>
               </v-row>
             </div>
           </v-card>
@@ -98,17 +125,23 @@ export default {
       incomeCards: [],
       expenseCards: [],
       count: 1,
-      dialog: false,
-      incomeID: ""
+      incomeDialog: false,
+      expenseDialog: false,
+      incomeID: "",
+      expenseID: "",
+      checkBox: false
     };
   },
   methods: {
     addToTotalIncome: function() {
-      console.log(this.incomeCards[0].amount);
-      console.log(this.income);
       for (var card in this.incomeCards) {
-        this.income += this.incomeCards[card].amount;
-        console.log(this.income);
+        console.log(this.incomeCards[card].checkBox);
+
+        if (this.incomeCards[card].checkBox == true) {
+          console.log(this.incomeCards[card].checkBox);
+          console.log(this.incomeCards[card].amount);
+          this.income += Number(this.incomeCards[card].amount);
+        }
       }
     },
     addIncomeCard: function() {
@@ -120,6 +153,7 @@ export default {
       });
     },
     deleteIncome: function(id) {
+      this.incomeDialog = true;
       db.collection("income")
         .doc(id)
         .delete()
@@ -128,6 +162,18 @@ export default {
         })
         .catch(function(error) {
           console.error("Error removing document: ", error);
+        });
+    },
+    deleteExpense: function(id) {
+      this.expenseDialog = false;
+      db.collection("expense")
+        .doc(id)
+        .delete()
+        .then(function() {
+          console.log("expense item deleted");
+        })
+        .catch(function(error) {
+          console.error("error removing expense doc: ", error);
         });
     }
   },
@@ -142,11 +188,10 @@ export default {
             id: change.doc.id
           });
         } else if (change.type === "removed") {
-          var id = change.doc.id;
-          console.log(id);
-          for (var card in this.incomeCards) {
-            this.incomeCards.splice(card, 1);
-          }
+          var id = change.doc.data();
+          console.log(change.doc.data());
+          var index = this.incomeCards.indexOf(id);
+          this.incomeCards.splice(index, 1);
         }
       });
     });
@@ -160,6 +205,11 @@ export default {
             ...change.doc.data(),
             id: change.doc.id
           });
+        } else if (change.type === "removed") {
+          var id = change.doc.data();
+          console.log(change.doc.data());
+          var index = this.expenseCards.indexOf(id);
+          this.expenseCards.splice(index, 1);
         }
       });
     });
