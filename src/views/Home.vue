@@ -1,9 +1,7 @@
 <template>
   <v-container grid-list-xs>
     <v-layout row wrap>
-      <v-flex xs12>
-        <v-text-field name="funds" label="Enter Income" id="funds" v-model="income"></v-text-field>
-      </v-flex>
+      <v-flex xs12></v-flex>
     </v-layout>
     <v-layout row wrap>
       <v-col>
@@ -23,12 +21,6 @@
               <v-row class="mx-auto">
                 <v-text-field class="ma-3" :label="card.inputLabel" v-model="card.amount"></v-text-field>
 
-                <v-checkbox
-                  class="ma-3"
-                  label="Paid"
-                  v-model="card.checkBox"
-                  v-on:click.native="addToTotalIncome"
-                ></v-checkbox>
                 <div class="text-center">
                   <v-dialog v-model="incomeDialog" width="500" :retain-focus="false">
                     <template v-slot:activator="{ on }">
@@ -77,7 +69,6 @@
             <div>
               <v-row class="mx-auto">
                 <v-text-field class="ma-3" :label="card.inputLabel" v-model="card.amount"></v-text-field>
-                <v-checkbox class="ma-3" label="Paid"></v-checkbox>
                 <div class="text-center">
                   <v-dialog v-model="expenseDialog" width="500" :retain-focus="false">
                     <template v-slot:activator="{ on }">

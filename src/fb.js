@@ -9,11 +9,12 @@ var firebaseConfig = {
   storageBucket: "mybudget-d3d21.appspot.com",
   messagingSenderId: "507018841755",
   appId: "1:507018841755:web:0901aae9650070742c803e",
-  measurementId: "G-SN0HGB61NM"
+  measurementId: "G-SN0HGB61NM",
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
+//ßconst auth = firebase.auth();
 
 export default db;

@@ -11,14 +11,20 @@
               </v-toolbar>
               <v-card-text>
                 <v-form>
-                  <v-text-field label="Login" name="login" type="text" />
+                  <v-text-field v-model="email" label="Login" name="login" type="text" />
 
-                  <v-text-field id="password" label="Password" name="password" type="password" />
+                  <v-text-field
+                    v-model="password"
+                    id="password"
+                    label="Password"
+                    name="password"
+                    type="password"
+                  />
                 </v-form>
               </v-card-text>
               <v-card-actions>
                 <v-spacer />
-                <v-btn color="primary" router to="/Home">Login</v-btn>
+                <v-btn color="primary" @click="login">Login</v-btn>
                 <v-btn color="primary" router to="/SignUp">Sign Up</v-btn>
               </v-card-actions>
             </v-card>
@@ -30,9 +36,28 @@
 </template>
 
 <script>
+import firebase from "@firebase/app";
+import "firebase/auth";
 export default {
-  props: {
-    source: String
+  data() {
+    return {
+      email: "",
+      password: ""
+    };
+  },
+  methods: {
+    login: function() {
+      firebase
+        .auth()
+        .signInWithEmailAndPassword(this.email, this.password)
+        .then(
+          user => {
+            alert("You are logged in as", user.user.email);
+            this.$router.go({ path: this.$router.path });
+          },
+          err => alert(err.message)
+        );
+    }
   }
 };
 </script>
