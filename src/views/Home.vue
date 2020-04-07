@@ -19,7 +19,10 @@
 
             <div>
               <v-row class="mx-auto">
-                <v-text-field class="ma-3" :label="card.inputLabel" v-model="card.amount"></v-text-field>
+                <v-text-field class="ma-3" label="Amount" v-model="card.amount"></v-text-field>
+                <v-text-field class="ma-3" label="Federal Tax" v-model="card.fedTax"></v-text-field>
+                <v-text-field class="ma-3" label="State Tax" v-model="card.stateTax"></v-text-field>
+                <v-text-field class="ma-3" label="FICA" v-model="card.fica"></v-text-field>
 
                 <div class="text-center">
                   <v-dialog v-model="incomeDialog" width="500" :retain-focus="false">
@@ -40,15 +43,57 @@
                         <v-btn
                           color="primary"
                           text
-                          @click="dialog = false"
+                          @click="incomeDialog = false"
                           v-on:click.native="deleteIncome(incomeID)"
                         >Delete</v-btn>
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
-                </div>
+                  <div>
+                    <v-dialog
+                      v-model="editDialog"
+                      :retain-focus="false"
+                      width="500"
+                      transition="dialog-transition"
+                    >
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          class="ma-3"
+                          color="green lighten-2"
+                          dark
+                          v-on="on"
+                          @click="incomeID=card.id"
+                        >Edit</v-btn>
+                      </template>
+                      <v-card>
+                        <v-card-title class="headline grey lighten-2" primary-title>Edit</v-card-title>
 
-                <!-- <DeleteIncomeDialog /> -->
+                        <v-card-text>Are you sure you want to edit this item?</v-card-text>
+                        <v-text-field class="ma-3" label="Title" v-model="incomeTitle"></v-text-field>
+
+                        <v-text-field class="ma-3" label="Amount" v-model="income"></v-text-field>
+                        <v-text-field class="ma-3" label="Federal Tax" v-model="fedTax"></v-text-field>
+                        <v-text-field class="ma-3" label="State Tax" v-model="stateTax"></v-text-field>
+                        <v-text-field class="ma-3" label="FICA" v-model="fica"></v-text-field>
+
+                        <v-text-field v-model="incomeID"></v-text-field>
+
+                        <v-divider></v-divider>
+
+                        <v-card-actions>
+                          <v-spacer></v-spacer>
+                          <v-btn
+                            color="primary"
+                            text
+                            @click="editDialog = false"
+                            v-on:click.native="editIncome(incomeID)"
+                          >Confirm</v-btn>
+                          <v-btn color="error" text @click="editDialog = false">Cancel</v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-dialog>
+                  </div>
+                </div>
               </v-row>
             </div>
           </v-card>
@@ -112,12 +157,16 @@ export default {
   data() {
     return {
       income: 0,
+      fedTax: 0,
+      stateTax: 0,
+      fica: 0,
       incomeTitle: "",
       incomeCards: [],
       expenseCards: [],
       count: 1,
       incomeDialog: false,
       expenseDialog: false,
+      editDialog: false,
       incomeID: "",
       expenseID: "",
       checkBox: false
@@ -135,16 +184,50 @@ export default {
         }
       }
     },
-    addIncomeCard: function() {
-      this.count += 1;
-      this.incomeCards.push({
-        title: "Income",
-        inputLabel: "Income " + this.count,
-        cardIncome: 0
+    onsnap: function() {
+      db.collection("income").onSnapshot(res => {
+        const changes = res.docChanges();
+
+        changes.forEach(change => {
+          if (change.type === "added") {
+            console.log(change.doc.id);
+            var editId = change.doc.id;
+            var editIndex = this.incomeCards.indexOf(editId);
+            this.incomeCards.splice(editIndex, 1);
+          }
+        });
       });
     },
+    editIncome: function(id) {
+      db.collection("income")
+        .doc(id)
+        .update({
+          amount: this.income,
+          fedTax: this.fedTax,
+          stateTax: this.stateTax,
+          fica: this.fica,
+          title: this.incomeTitle
+        })
+        .then(function() {
+          console.log("Document successfully written!");
+          db.collection("income").onSnapshot(res => {
+            const changes = res.docChanges();
+
+            changes.forEach(change => {
+              if (change.type === "added") {
+                console.log(change.doc.id);
+                var editId = change.doc.id;
+                var editIndex = this.incomeCards.indexOf(editId);
+                this.incomeCards.splice(editIndex, 1);
+              }
+            });
+          });
+        })
+        .catch(function(error) {
+          console.error("Error writing document: ", error);
+        });
+    },
     deleteIncome: function(id) {
-      this.incomeDialog = true;
       db.collection("income")
         .doc(id)
         .delete()
@@ -179,10 +262,11 @@ export default {
             id: change.doc.id
           });
         } else if (change.type === "removed") {
-          var id = change.doc.data();
-          console.log(change.doc.data());
-          var index = this.incomeCards.indexOf(id);
-          this.incomeCards.splice(index, 1);
+          var id = change.doc.id;
+          console.log(change.doc.id);
+          this.incomeCards = this.incomeCards.filter(function(item) {
+            return item.id != id;
+          });
         }
       });
     });
@@ -197,10 +281,10 @@ export default {
             id: change.doc.id
           });
         } else if (change.type === "removed") {
-          var id = change.doc.data();
-          console.log(change.doc.data());
-          var index = this.expenseCards.indexOf(id);
-          this.expenseCards.splice(index, 1);
+          var id = change.doc.id;
+          this.expenseCards = this.expenseCards.filter(function(item) {
+            return item.id != id;
+          });
         }
       });
     });

@@ -8,6 +8,8 @@
               <v-form>
                 <v-layout row>
                   <v-flex xs12>
+                    <v-text-field v-model="name" name="name" label="Name" type="name"></v-text-field>
+
                     <v-text-field v-model="email" name="email" label="Email" type="email"></v-text-field>
                     <v-text-field
                       v-model="password"
@@ -32,9 +34,12 @@
 <script>
 import firebase from "@firebase/app";
 import "firebase/auth";
+import db from "@/fb.js";
+
 export default {
   data() {
     return {
+      name: "",
       email: "",
       password: ""
     };
@@ -44,13 +49,21 @@ export default {
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.email, this.password)
-        .then(
-          user => {
-            alert("Account created for", user.email);
-            this.$router.go({ path: this.$router.path });
-          },
-          err => alert(err.message)
-        );
+        .then(cred => {
+          return db
+            .collection("users")
+            .doc(cred.user.uid)
+            .set({
+              name: this.name
+            });
+          // alert("Account created for", user.email);
+          // this.$router.go({ path: this.$router.path });
+        })
+        .then(() => {
+          this.name = "";
+          this.email = "";
+          this.password = "";
+        });
     }
   }
 };
