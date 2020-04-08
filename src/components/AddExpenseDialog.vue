@@ -14,7 +14,7 @@
               <v-row>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
-                    label="expense Name"
+                    label="Expense Name"
                     required
                     v-model="expenseTitle"
                     :rules="inputRules"
@@ -22,11 +22,12 @@
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
-                    label="expense Amount"
+                    label="Expense Amount"
                     hint="How much did you pay?"
                     persistent-hint
                     required
                     v-model="expenseAmount"
+                    :rules="numberRule"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -57,6 +58,10 @@ export default {
     expenseAmount: "",
     inputRules: [
       v => v.length >= 3 || "Title must be more than three characters"
+    ],
+    numberRule: [
+      v =>
+        (!isNaN(parseFloat(v)) && v >= 0) || "Must be a number greater than 0"
     ]
   }),
   methods: {

@@ -19,10 +19,10 @@
 
             <div>
               <v-row class="mx-auto">
-                <v-text-field class="ma-3" label="Amount" v-model="card.amount"></v-text-field>
-                <v-text-field class="ma-3" label="Federal Tax" v-model="card.fedTax"></v-text-field>
-                <v-text-field class="ma-3" label="State Tax" v-model="card.stateTax"></v-text-field>
-                <v-text-field class="ma-3" label="FICA" v-model="card.fica"></v-text-field>
+                <v-text-field readonly class="ma-3" label="Amount" v-model="card.amount"></v-text-field>
+                <v-text-field readonly class="ma-3" label="Federal Tax" v-model="card.fedTax"></v-text-field>
+                <v-text-field readonly class="ma-3" label="State Tax" v-model="card.stateTax"></v-text-field>
+                <v-text-field readonly class="ma-3" label="FICA" v-model="card.fica"></v-text-field>
 
                 <div class="text-center">
                   <v-dialog v-model="incomeDialog" width="500" :retain-focus="false">
@@ -62,7 +62,7 @@
                           color="green lighten-2"
                           dark
                           v-on="on"
-                          @click="incomeID=card.id"
+                          @click="incomeID=card.id, incomeTitle = card.title, income = card.amount, fedTax = card.fedTax, stateTax = card.stateTax, fica = card.fica"
                         >Edit</v-btn>
                       </template>
                       <v-card>
@@ -113,7 +113,7 @@
             <div class="ma-3">{{ card.title }}</div>
             <div>
               <v-row class="mx-auto">
-                <v-text-field class="ma-3" :label="card.inputLabel" v-model="card.amount"></v-text-field>
+                <v-text-field class="ma-3" readonly :label="card.inputLabel" v-model="card.amount"></v-text-field>
                 <div class="text-center">
                   <v-dialog v-model="expenseDialog" width="500" :retain-focus="false">
                     <template v-slot:activator="{ on }">
@@ -138,6 +138,47 @@
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
+                  <div>
+                    <v-dialog
+                      v-model="editExDialog"
+                      :retain-focus="false"
+                      width="500"
+                      transition="dialog-transition"
+                    >
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          class="ma-3"
+                          color="green lighten-2"
+                          dark
+                          v-on="on"
+                          @click="expenseID=card.id"
+                        >Edit</v-btn>
+                      </template>
+                      <v-card>
+                        <v-card-title class="headline grey lighten-2" primary-title>Edit</v-card-title>
+
+                        <v-card-text>Are you sure you want to edit this item?</v-card-text>
+                        <v-text-field class="ma-3" label="Title" v-model="expenseTitle"></v-text-field>
+
+                        <v-text-field class="ma-3" label="Amount" v-model="expense"></v-text-field>
+
+                        <v-text-field v-model="expenseID"></v-text-field>
+
+                        <v-divider></v-divider>
+
+                        <v-card-actions>
+                          <v-spacer></v-spacer>
+                          <v-btn
+                            color="primary"
+                            text
+                            @click="editExDialog = false"
+                            v-on:click.native="editExpense(expenseID)"
+                          >Confirm</v-btn>
+                          <v-btn color="error" text @click="editExDialog = false">Cancel</v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-dialog>
+                  </div>
                 </div>
               </v-row>
             </div>
@@ -157,47 +198,25 @@ export default {
   data() {
     return {
       income: 0,
+      expense: 0,
       fedTax: 0,
       stateTax: 0,
       fica: 0,
       incomeTitle: "",
+      expenseTitle: "",
       incomeCards: [],
       expenseCards: [],
       count: 1,
       incomeDialog: false,
       expenseDialog: false,
       editDialog: false,
+      editExDialog: false,
       incomeID: "",
       expenseID: "",
       checkBox: false
     };
   },
   methods: {
-    addToTotalIncome: function() {
-      for (var card in this.incomeCards) {
-        console.log(this.incomeCards[card].checkBox);
-
-        if (this.incomeCards[card].checkBox == true) {
-          console.log(this.incomeCards[card].checkBox);
-          console.log(this.incomeCards[card].amount);
-          this.income += Number(this.incomeCards[card].amount);
-        }
-      }
-    },
-    onsnap: function() {
-      db.collection("income").onSnapshot(res => {
-        const changes = res.docChanges();
-
-        changes.forEach(change => {
-          if (change.type === "added") {
-            console.log(change.doc.id);
-            var editId = change.doc.id;
-            var editIndex = this.incomeCards.indexOf(editId);
-            this.incomeCards.splice(editIndex, 1);
-          }
-        });
-      });
-    },
     editIncome: function(id) {
       db.collection("income")
         .doc(id)
@@ -210,6 +229,27 @@ export default {
         })
         .then(function() {
           console.log("Document successfully written!");
+          this.amount = "";
+          this.fedTax = "";
+          this.stateTax = "";
+          this.fica = "";
+          this.title = "";
+        })
+        .catch(function(error) {
+          console.error("Error writing document: ", error);
+        });
+    },
+    editExpense: function(id) {
+      db.collection("expense")
+        .doc(id)
+        .update({
+          amount: this.expense,
+          title: this.expenseTitle
+        })
+        .then(function() {
+          console.log("Document successfully written!");
+          this.amount = "";
+          this.title = "";
         })
         .catch(function(error) {
           console.error("Error writing document: ", error);
@@ -221,6 +261,12 @@ export default {
         .delete()
         .then(function() {
           console.log("Document successfully deleted!");
+          this.amount = "";
+          this.fedTax = "";
+          this.stateTax = "";
+          this.fica = "";
+          this.title = "";
+          this.incomeID = "";
         })
         .catch(function(error) {
           console.error("Error removing document: ", error);
@@ -233,6 +279,7 @@ export default {
         .delete()
         .then(function() {
           console.log("expense item deleted");
+          this.expenseID = "";
         })
         .catch(function(error) {
           console.error("error removing expense doc: ", error);
@@ -281,6 +328,14 @@ export default {
           var id = change.doc.id;
           this.expenseCards = this.expenseCards.filter(function(item) {
             return item.id != id;
+          });
+        } else if (change.type === "modified") {
+          var editID = change.doc.id;
+          this.expenseCards = this.expenseCards.filter(function(item) {
+            return item.id != editID;
+          });
+          this.expenseCards.push({
+            ...change.doc.data()
           });
         }
       });
