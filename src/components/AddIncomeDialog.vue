@@ -10,7 +10,7 @@
             <span class="headline">New Income</span>
           </v-card-title>
           <v-card-text>
-            <v-container>
+            <v-container v-model="valid">
               <v-row>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
@@ -27,10 +27,29 @@
                     persistent-hint
                     required
                     v-model="incomeAmount"
+                    :rules="numberRule"
                   ></v-text-field>
-                  <v-text-field name="fedTax" label="Federal Tax" id="fedTax" v-model="fedTax"></v-text-field>
-                  <v-text-field name="stateTax" label="State Tax" id="stateTax" v-model="stateTax"></v-text-field>
-                  <v-text-field name="ficaTax" label="FICA Tax" id="ficaTax" v-model="fica"></v-text-field>
+                  <v-text-field
+                    name="fedTax"
+                    label="Federal Tax"
+                    id="fedTax"
+                    v-model="fedTax"
+                    :rules="numberRule"
+                  ></v-text-field>
+                  <v-text-field
+                    name="stateTax"
+                    label="State Tax"
+                    id="stateTax"
+                    v-model="stateTax"
+                    :rules="numberRule"
+                  ></v-text-field>
+                  <v-text-field
+                    name="ficaTax"
+                    label="FICA Tax"
+                    id="ficaTax"
+                    v-model="fica"
+                    :rules="numberRule"
+                  ></v-text-field>
                 </v-col>
               </v-row>
             </v-container>
@@ -43,6 +62,7 @@
               text
               @click="dialog = false"
               v-on:click.native="saveNewIncome"
+              :disabled="!valid"
             >Save</v-btn>
           </v-card-actions>
         </v-card>
@@ -56,6 +76,7 @@ import db from "@/fb";
 export default {
   data: () => ({
     dialog: false,
+    valid: false,
     incomeTitle: "",
     incomeAmount: "",
     stateTax: "",
@@ -63,6 +84,10 @@ export default {
     fica: "",
     inputRules: [
       v => v.length >= 3 || "Title must be more than three characters"
+    ],
+    numberRule: [
+      v =>
+        (!isNaN(parseFloat(v)) && v >= 0) || "Must be a number greater than 0"
     ]
   }),
   methods: {

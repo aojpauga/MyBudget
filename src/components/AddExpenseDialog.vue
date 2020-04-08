@@ -10,7 +10,7 @@
             <span class="headline">New expense</span>
           </v-card-title>
           <v-card-text>
-            <v-container>
+            <v-container v-model="valid">
               <v-row>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
@@ -41,6 +41,7 @@
               text
               @click="dialog = false"
               v-on:click.native="saveNewExpense"
+              :disabled="!valid"
             >Save</v-btn>
           </v-card-actions>
         </v-card>
@@ -54,6 +55,7 @@ import db from "@/fb";
 export default {
   data: () => ({
     dialog: false,
+    valid: false,
     expenseTitle: "",
     expenseAmount: "",
     inputRules: [
