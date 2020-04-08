@@ -210,18 +210,6 @@ export default {
         })
         .then(function() {
           console.log("Document successfully written!");
-          db.collection("income").onSnapshot(res => {
-            const changes = res.docChanges();
-
-            changes.forEach(change => {
-              if (change.type === "added") {
-                console.log(change.doc.id);
-                var editId = change.doc.id;
-                var editIndex = this.incomeCards.indexOf(editId);
-                this.incomeCards.splice(editIndex, 1);
-              }
-            });
-          });
         })
         .catch(function(error) {
           console.error("Error writing document: ", error);
@@ -256,6 +244,7 @@ export default {
       const changes = res.docChanges();
 
       changes.forEach(change => {
+        console.log(change.type);
         if (change.type === "added") {
           this.incomeCards.push({
             ...change.doc.data(),
@@ -267,6 +256,8 @@ export default {
           this.incomeCards = this.incomeCards.filter(function(item) {
             return item.id != id;
           });
+        } else if (change.type === "modified") {
+          console.log("edit");
         }
       });
     });
