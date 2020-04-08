@@ -3,6 +3,10 @@
     <v-layout row wrap>
       <v-flex xs12 sm6 offset-sm3>
         <v-card>
+          <v-toolbar color="primary" dark flat>
+            <v-toolbar-title>Sign Up Form</v-toolbar-title>
+            <v-spacer />
+          </v-toolbar>
           <v-card-text>
             <v-container grid-list-xs>
               <v-form>
@@ -49,16 +53,20 @@ export default {
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.email, this.password)
-        .then(cred => {
-          return db
-            .collection("users")
-            .doc(cred.user.uid)
-            .set({
-              name: this.name
-            });
-          // alert("Account created for", user.email);
-          // this.$router.go({ path: this.$router.path });
-        })
+        .then(
+          cred => {
+            console.log(cred);
+            alert("Your account was created");
+            this.$router.go({ path: this.$router.path });
+            return db
+              .collection("users")
+              .doc(cred.user.uid)
+              .set({
+                name: this.name
+              });
+          },
+          () => alert("Please fill form correctly")
+        )
         .then(() => {
           this.name = "";
           this.email = "";

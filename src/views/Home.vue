@@ -7,6 +7,12 @@
       <v-col>
         <v-flex xs12>
           <AddIncomeDialog />
+          <v-skeleton-loader
+            class="mx-auto"
+            max-width="500"
+            type="card"
+            v-if="incomeLoading == true"
+          ></v-skeleton-loader>
           <v-card
             xs12
             class="pa-3"
@@ -102,6 +108,12 @@
       <v-col>
         <v-flex xs12>
           <AddExpenseDialog />
+          <v-skeleton-loader
+            class="mx-auto"
+            max-width="500"
+            type="card"
+            v-if="expenseLoading == true"
+          ></v-skeleton-loader>
           <v-card
             xs12
             class="pa-3"
@@ -213,7 +225,8 @@ export default {
       editExDialog: false,
       incomeID: "",
       expenseID: "",
-      checkBox: false
+      incomeLoading: true,
+      expenseLoading: true
     };
   },
   methods: {
@@ -229,7 +242,7 @@ export default {
         })
         .then(function() {
           console.log("Document successfully written!");
-          this.amount = "";
+          this.income = "";
           this.fedTax = "";
           this.stateTax = "";
           this.fica = "";
@@ -248,8 +261,8 @@ export default {
         })
         .then(function() {
           console.log("Document successfully written!");
-          this.amount = "";
-          this.title = "";
+          //this.expense = 0;
+          //this.title = "";
         })
         .catch(function(error) {
           console.error("Error writing document: ", error);
@@ -261,7 +274,7 @@ export default {
         .delete()
         .then(function() {
           console.log("Document successfully deleted!");
-          this.amount = "";
+          this.income = "";
           this.fedTax = "";
           this.stateTax = "";
           this.fica = "";
@@ -289,6 +302,9 @@ export default {
   created() {
     db.collection("income").onSnapshot(res => {
       const changes = res.docChanges();
+      console.log("loading", this.incomeLoading);
+      this.incomeLoading = false;
+      console.log("loading", this.incomeLoading);
 
       changes.forEach(change => {
         console.log(change.type);
@@ -317,6 +333,7 @@ export default {
 
     db.collection("expense").onSnapshot(res => {
       const changes = res.docChanges();
+      this.expenseLoading = false;
 
       changes.forEach(change => {
         if (change.type === "added") {

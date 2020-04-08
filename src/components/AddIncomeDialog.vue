@@ -10,48 +10,50 @@
             <span class="headline">New Income</span>
           </v-card-title>
           <v-card-text>
-            <v-container v-model="valid">
-              <v-row>
-                <v-col cols="12" sm="6" md="4">
-                  <v-text-field
-                    label="Income Name"
-                    required
-                    v-model="incomeTitle"
-                    :rules="inputRules"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <v-text-field
-                    label="Gross Amount"
-                    hint="How much did you get paid?"
-                    persistent-hint
-                    required
-                    v-model="incomeAmount"
-                    :rules="numberRule"
-                  ></v-text-field>
-                  <v-text-field
-                    name="fedTax"
-                    label="Federal Tax"
-                    id="fedTax"
-                    v-model="fedTax"
-                    :rules="numberRule"
-                  ></v-text-field>
-                  <v-text-field
-                    name="stateTax"
-                    label="State Tax"
-                    id="stateTax"
-                    v-model="stateTax"
-                    :rules="numberRule"
-                  ></v-text-field>
-                  <v-text-field
-                    name="ficaTax"
-                    label="FICA Tax"
-                    id="ficaTax"
-                    v-model="fica"
-                    :rules="numberRule"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
+            <v-container>
+              <v-form v-model="valid">
+                <v-row>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      label="Income Name"
+                      required
+                      v-model="incomeTitle"
+                      :rules="inputRules"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      label="Gross Amount"
+                      hint="How much did you get paid?"
+                      persistent-hint
+                      required
+                      v-model="incomeAmount"
+                      :rules="numberRule"
+                    ></v-text-field>
+                    <v-text-field
+                      name="fedTax"
+                      label="Federal Tax"
+                      id="fedTax"
+                      v-model="fedTax"
+                      :rules="numberRule"
+                    ></v-text-field>
+                    <v-text-field
+                      name="stateTax"
+                      label="State Tax"
+                      id="stateTax"
+                      v-model="stateTax"
+                      :rules="numberRule"
+                    ></v-text-field>
+                    <v-text-field
+                      name="ficaTax"
+                      label="FICA Tax"
+                      id="ficaTax"
+                      v-model="fica"
+                      :rules="numberRule"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-form>
             </v-container>
           </v-card-text>
           <v-card-actions>
