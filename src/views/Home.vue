@@ -257,7 +257,13 @@ export default {
             return item.id != id;
           });
         } else if (change.type === "modified") {
-          console.log("edit");
+          var editID = change.doc.id;
+          this.incomeCards = this.incomeCards.filter(function(item) {
+            return item.id != editID;
+          });
+          this.incomeCards.push({
+            ...change.doc.data()
+          });
         }
       });
     });
