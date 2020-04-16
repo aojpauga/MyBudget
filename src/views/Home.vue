@@ -56,48 +56,76 @@
                     </v-card>
                   </v-dialog>
                   <div>
-                    <v-dialog
-                      v-model="editDialog"
-                      :retain-focus="false"
-                      width="500"
-                      transition="dialog-transition"
-                    >
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          class="ma-3"
-                          color="green lighten-2"
-                          dark
-                          v-on="on"
-                          @click="incomeID=card.id, incomeTitle = card.title, income = card.amount, fedTax = card.fedTax, stateTax = card.stateTax, fica = card.fica"
-                        >Edit</v-btn>
-                      </template>
-                      <v-card>
-                        <v-card-title class="headline grey lighten-2" primary-title>Edit</v-card-title>
-
-                        <v-card-text>Are you sure you want to edit this item?</v-card-text>
-                        <v-text-field class="ma-3" label="Title" v-model="incomeTitle"></v-text-field>
-
-                        <v-text-field class="ma-3" label="Amount" v-model="income"></v-text-field>
-                        <v-text-field class="ma-3" label="Federal Tax" v-model="fedTax"></v-text-field>
-                        <v-text-field class="ma-3" label="State Tax" v-model="stateTax"></v-text-field>
-                        <v-text-field class="ma-3" label="FICA" v-model="fica"></v-text-field>
-
-                        <v-text-field v-model="incomeID"></v-text-field>
-
-                        <v-divider></v-divider>
-
-                        <v-card-actions>
-                          <v-spacer></v-spacer>
+                    <v-form v-model="valid">
+                      <v-dialog
+                        v-model="editDialog"
+                        :retain-focus="false"
+                        width="500"
+                        transition="dialog-transition"
+                      >
+                        <template v-slot:activator="{ on }">
                           <v-btn
-                            color="primary"
-                            text
-                            @click="editDialog = false"
-                            v-on:click.native="editIncome(incomeID)"
-                          >Confirm</v-btn>
-                          <v-btn color="error" text @click="editDialog = false">Cancel</v-btn>
-                        </v-card-actions>
-                      </v-card>
-                    </v-dialog>
+                            class="ma-3"
+                            color="green lighten-2"
+                            dark
+                            v-on="on"
+                            @click="incomeID=card.id, incomeTitle = card.title, income = card.amount, fedTax = card.fedTax, stateTax = card.stateTax, fica = card.fica"
+                          >Edit</v-btn>
+                        </template>
+                        <v-card>
+                          <v-card-title class="headline grey lighten-2" primary-title>Edit</v-card-title>
+
+                          <v-card-text>Are you sure you want to edit this item?</v-card-text>
+                          <v-text-field
+                            class="ma-3"
+                            label="Title"
+                            v-model="incomeTitle"
+                            :rules="wordRules"
+                          ></v-text-field>
+
+                          <v-text-field
+                            class="ma-3"
+                            label="Amount"
+                            v-model="income"
+                            :rules="inputRules"
+                          ></v-text-field>
+                          <v-text-field
+                            class="ma-3"
+                            label="Federal Tax"
+                            v-model="fedTax"
+                            :rules="inputRules"
+                          ></v-text-field>
+                          <v-text-field
+                            class="ma-3"
+                            label="State Tax"
+                            v-model="stateTax"
+                            :rules="inputRules"
+                          ></v-text-field>
+                          <v-text-field
+                            class="ma-3"
+                            label="FICA"
+                            v-model="fica"
+                            :rules="inputRules"
+                          ></v-text-field>
+
+                          <v-text-field v-model="incomeID"></v-text-field>
+
+                          <v-divider></v-divider>
+
+                          <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              color="primary"
+                              text
+                              :disabled="!valid"
+                              @click="editDialog = false"
+                              v-on:click.native="editIncome(incomeID)"
+                            >Confirm</v-btn>
+                            <v-btn color="error" text @click="editDialog = false">Cancel</v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </v-dialog>
+                    </v-form>
                   </div>
                 </div>
               </v-row>
@@ -166,29 +194,42 @@
                           @click="expenseID=card.id"
                         >Edit</v-btn>
                       </template>
-                      <v-card>
-                        <v-card-title class="headline grey lighten-2" primary-title>Edit</v-card-title>
+                      <v-form v-model="valid">
+                        <v-card>
+                          <v-card-title class="headline grey lighten-2" primary-title>Edit</v-card-title>
 
-                        <v-card-text>Are you sure you want to edit this item?</v-card-text>
-                        <v-text-field class="ma-3" label="Title" v-model="expenseTitle"></v-text-field>
+                          <v-card-text>Are you sure you want to edit this item?</v-card-text>
+                          <v-text-field
+                            class="ma-3"
+                            label="Title"
+                            v-model="expenseTitle"
+                            :rules="wordRules"
+                          ></v-text-field>
 
-                        <v-text-field class="ma-3" label="Amount" v-model="expense"></v-text-field>
+                          <v-text-field
+                            class="ma-3"
+                            label="Amount"
+                            v-model="expense"
+                            :rules="inputRules"
+                          ></v-text-field>
 
-                        <v-text-field v-model="expenseID"></v-text-field>
+                          <v-text-field v-model="expenseID"></v-text-field>
 
-                        <v-divider></v-divider>
+                          <v-divider></v-divider>
 
-                        <v-card-actions>
-                          <v-spacer></v-spacer>
-                          <v-btn
-                            color="primary"
-                            text
-                            @click="editExDialog = false"
-                            v-on:click.native="editExpense(expenseID)"
-                          >Confirm</v-btn>
-                          <v-btn color="error" text @click="editExDialog = false">Cancel</v-btn>
-                        </v-card-actions>
-                      </v-card>
+                          <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              color="primary"
+                              text
+                              :disabled="!valid"
+                              @click="editExDialog = false"
+                              v-on:click.native="editExpense(expenseID)"
+                            >Confirm</v-btn>
+                            <v-btn color="error" text @click="editExDialog = false">Cancel</v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </v-form>
                     </v-dialog>
                   </div>
                 </div>
@@ -226,7 +267,20 @@ export default {
       incomeID: "",
       expenseID: "",
       incomeLoading: true,
-      expenseLoading: true
+      expenseLoading: true,
+      valid: false,
+      inputRules: [
+        v => !!v || "Required",
+        v => {
+          if (!isNaN(parseFloat(v)) && v >= 0) return true;
+          return "Must be a number";
+        }
+      ],
+      numberRule: v => {
+        if (!isNaN(parseFloat(v)) && v >= 0) return true;
+        return "Must be a number";
+      },
+      wordRules: [v => !!v || "Required"]
     };
   },
   methods: {
